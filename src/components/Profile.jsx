@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import image from "../assets/profile.jpeg";
+import image from "../assets/femaleChar.png";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import { cardStyle } from "./ReusableStyles";
 

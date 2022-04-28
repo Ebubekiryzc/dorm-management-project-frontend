@@ -32,11 +32,6 @@ export default function Earnings() {
             data={data}
             margin={{ top: 0, left: 0, right: 0, bottom: 0 }}
           >
-            <XAxis
-              dataKey="day"
-              scale="point"
-              padding={{ left: 10, right: 10 }}
-            />
             <Tooltip cursor={false} />
             <Bar
               animationBegin={800}
