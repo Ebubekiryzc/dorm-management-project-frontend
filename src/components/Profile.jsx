@@ -4,29 +4,29 @@ import image from "../assets/femaleChar.png";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import { cardStyle } from "./ReusableStyles";
 
-export default function Profile() {
+export default function Profile({...props}) {
   return (
     <Section>
       <div className="image">
         <img src={image} alt="character" />
       </div>
       <div className="title">
-        <h2>Kishan Sheth</h2>
+        <h2>{props.firstName}{props.lastName}</h2>
         <h5>
           <HiOutlineLocationMarker />
           New York, USA
         </h5>
       </div>
       <div className="info">
-        <div className="container">
+        <div className="custom-container">
           <h5>Days at work</h5>
           <h3>28</h3>
         </div>
-        <div className="container">
+        <div className="custom-container">
           <h5>Rides</h5>
           <h3>427</h3>
         </div>
-        <div className="container">
+        <div className="custom-container">
           <h5>Hours</h5>
           <h3>76</h3>
         </div>
@@ -72,7 +72,7 @@ const Section = styled.section`
   .info {
     display: flex;
     gap: 1rem;
-    .container {
+    .custom-container {
       text-align: center;
     }
   }

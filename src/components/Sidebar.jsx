@@ -2,22 +2,44 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import scrollreveal from "scrollreveal";
 
-import { MdSpaceDashboard } from "react-icons/md";
-import { RiDashboard2Fill } from "react-icons/ri";
-import { FaAddressCard, FaTaxi } from "react-icons/fa";
-import { GiTwirlCenter, GiHamburgerMenu } from "react-icons/gi";
-import { BsFillChatTextFill } from "react-icons/bs";
-import { IoSettings } from "react-icons/io5";
+import { MdDateRange, MdSpaceDashboard } from "react-icons/md";
+import { FaBed, FaGraduationCap } from "react-icons/fa";
+import { DiDatabase } from "react-icons/di";
+import { GiHamburgerMenu } from "react-icons/gi";
+import { BsPersonCircle } from "react-icons/bs";
 import { FiLogOut } from "react-icons/fi";
 import { VscChromeClose } from "react-icons/vsc";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../store/actions/authActions";
+import { Link, NavLink } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
 export default function Sidebar() {
-  const [currentLink, setCurrentLink] = useState(1);
   const [navbarState, setNavbarState] = useState(false);
+  const [role, setRole] = useState("student");
   const html = document.querySelector("html");
   html.addEventListener("click", () => setNavbarState(false));
 
+  const history = useHistory();
+  const userLogin = useSelector((state) => state.userLogin);
+  const { userInfo } = userLogin;
+
+  const dispatch = useDispatch();
+  const handleLogout = () => {
+    dispatch(logout());
+  };
+
   useEffect(() => {
+    if (!userInfo) {
+      history.push("/");
+    } else {
+      if (localStorage.getItem("roles").includes("admin")) {
+        setRole("admin");
+      } else if (localStorage.getItem("roles").includes("staff")) {
+        setRole("staff");
+      }
+    }
+
     const scroll = scrollreveal({
       origin: "left",
       distance: "80px",
@@ -27,25 +49,27 @@ export default function Sidebar() {
     scroll.reveal(
       `
     .brand,
-    .links>ul>li:nth-of-type(1),
-    .links>ul>li:nth-of-type(2),
-    .links>ul>li:nth-of-type(3),
-    .links>ul>li:nth-of-type(4),
-    .links>ul>li:nth-of-type(5),
-    .links>ul>li:nth-of-type(6),
+    .links>ul>.nav-link:nth-of-type(1),
+    .links>ul>.nav-link:nth-of-type(2),
+    .links>ul>.nav-link:nth-of-type(3),
+    .links>ul>.nav-link:nth-of-type(4),
+    .links>ul>.nav-link:nth-of-type(5),
+    .links>ul>.nav-link:nth-of-type(6),
     .logout
     `,
       { opacity: 0, interval: 30 }
     );
-  }, []);
+  }, [history, userInfo]);
+
+  //TODO: if role == "admin" o zaman şu seçenekler olsun gibi bir şey eklenecek.
 
   return (
     <>
       <Section>
         <div className="top">
           <div className="brand">
-            <FaTaxi />
-            <span> MY TAXI</span>
+            <FaBed />
+            <span> Dormy </span>
           </div>
           <div className="toggle">
             {navbarState ? (
@@ -61,127 +85,124 @@ export default function Sidebar() {
           </div>
           <div className="links">
             <ul>
-              <li
-                onClick={() => setCurrentLink(1)}
-                className={currentLink === 1 ? "active" : "none"}
-              >
-                <a href="#">
+              <NavLink exact to="/dashboard" className="nav-link">
+                <div>
                   <MdSpaceDashboard />
                   <span>Dashboard</span>
-                </a>
-              </li>
-              <li
-                onClick={() => setCurrentLink(2)}
-                className={currentLink === 2 ? "active" : "none"}
+                </div>
+              </NavLink>
+              <NavLink to="/dashboard/day_offs" className="nav-link">
+                <div>
+                  <MdDateRange />
+                  <span>İzinlerim</span>
+                </div>
+              </NavLink>
+              <NavLink
+                to="/dashboard/staffs"
+                className={`${
+                  role === "admin" ? "display-block" : "display-none"
+                } nav-link`}
               >
-                <a href="#">
-                  <RiDashboard2Fill />
-                  <span>Riders</span>
-                </a>
-              </li>
-              <li
-                onClick={() => setCurrentLink(3)}
-                className={currentLink === 3 ? "active" : "none"}
+                <div>
+                  <BsPersonCircle />
+                  <span>Görevliler</span>
+                </div>
+              </NavLink>
+              <NavLink
+                to="/dashboard/students"
+                className={`${
+                  role === "admin" || role === "staff"
+                    ? "display-block"
+                    : "display-none"
+                } nav-link`}
               >
-                <a href="#">
-                  <FaAddressCard />
-                  <span>Payment Details</span>
-                </a>
-              </li>
-              <li
-                onClick={() => setCurrentLink(4)}
-                className={currentLink === 4 ? "active" : "none"}
+                <div>
+                  <FaGraduationCap />
+                  <span>Öğrenciler</span>
+                </div>
+              </NavLink>
+              <NavLink
+                to="/dashboard/database"
+                className={`${
+                  role === "admin" ? "display-block" : "display-none"
+                } nav-link`}
               >
-                <a href="#">
-                  <GiTwirlCenter />
-                  <span>Learning Center</span>
-                </a>
-              </li>
-              <li
-                onClick={() => setCurrentLink(5)}
-                className={currentLink === 5 ? "active" : "none"}
-              >
-                <a href="#">
-                  <BsFillChatTextFill />
-                  <span>FAQs</span>
-                </a>
-              </li>
-              <li
-                onClick={() => setCurrentLink(6)}
-                className={currentLink === 6 ? "active" : "none"}
-              >
-                <a href="#">
-                  <IoSettings />
-                  <span>Settings</span>
-                </a>
-              </li>
+                <div>
+                  <DiDatabase />
+                  <span>Veri Tabanı</span>
+                </div>
+              </NavLink>
             </ul>
           </div>
         </div>
         <div className="logout">
-          <a href="">
+          <Link to="/" onClick={handleLogout}>
             <FiLogOut />
-            <span className="logout">Logout</span>
-          </a>
+            <span className="logout">Çıkış Yap</span>
+          </Link>
         </div>
       </Section>
       <ResponsiveNav state={navbarState} className={navbarState ? "show" : ""}>
         <div className="responsive__links">
           <ul>
-            <li
-              className={currentLink === 1 ? "active" : "none"}
-              onClick={() => setCurrentLink(1)}
-            >
-              <a href="#">
+            <NavLink exact to="/dashboard" className="nav-link">
+              <div>
                 <MdSpaceDashboard />
-                <span> Dashboard</span>
-              </a>
-            </li>
-            <li
-              className={currentLink === 2 ? "active" : "none"}
-              onClick={() => setCurrentLink(2)}
+                <span>Dashboard</span>
+              </div>
+            </NavLink>
+            <NavLink to="/dashboard/dayoffs" className="nav-link">
+              <div>
+                <MdDateRange />
+                <span>İzinlerim</span>
+              </div>
+            </NavLink>
+            <NavLink
+              to="/dashboard/staffs"
+              className={`${
+                role === "admin" ? "display-block" : "display-none"
+              } nav-link`}
             >
-              <a href="#">
-                <RiDashboard2Fill />
-                <span> Riders</span>
-              </a>
-            </li>
-            <li
-              className={currentLink === 3 ? "active" : "none"}
-              onClick={() => setCurrentLink(3)}
+              <div>
+                <BsPersonCircle />
+                <span>Görevliler</span>
+              </div>
+            </NavLink>
+            <NavLink
+              to="/dashboard/students"
+              className={`${
+                role === "admin" || role === "staff"
+                  ? "display-block"
+                  : "display-none"
+              } nav-link`}
             >
-              <a href="#">
-                <FaAddressCard />
-                <span> Payment Details</span>
-              </a>
-            </li>
-            <li
-              className={currentLink === 4 ? "active" : "none"}
-              onClick={() => setCurrentLink(4)}
+              <div>
+                <FaGraduationCap />
+                <span>Öğrenciler</span>
+              </div>
+            </NavLink>
+            <NavLink
+              to="/dashboard/database"
+              className={`${
+                role === "admin" ? "display-block" : "display-none"
+              } nav-link`}
             >
-              <a href="#">
-                <GiTwirlCenter />
-                <span> Learning Center</span>
-              </a>
-            </li>
-            <li
-              className={currentLink === 5 ? "active" : "none"}
-              onClick={() => setCurrentLink(5)}
+              <div>
+                <DiDatabase />
+                <span>Veri Tabanı</span>
+              </div>
+            </NavLink>
+            <NavLink
+              className="custom-bg-danger nav-link"
+              exact
+              to="/"
+              onClick={handleLogout}
             >
-              <a href="#">
-                <BsFillChatTextFill />
-                <span> FAQs</span>
-              </a>
-            </li>
-            <li
-              className={currentLink === 6 ? "active" : "none"}
-              onClick={() => setCurrentLink(6)}
-            >
-              <a href="#">
-                <IoSettings />
-                <span> Settings</span>
-              </a>
-            </li>
+              <div>
+                <FiLogOut />
+                <span>Çıkış Yap</span>
+              </div>
+            </NavLink>
           </ul>
         </div>
       </ResponsiveNav>
@@ -201,6 +222,7 @@ const Section = styled.section`
   justify-content: space-between;
   padding: 2rem 0;
   gap: 2rem;
+  font-size: 1.2rem;
   .top {
     display: flex;
     flex-direction: column;
@@ -232,17 +254,17 @@ const Section = styled.section`
         display: flex;
         flex-direction: column;
         gap: 1rem;
-        li {
-          padding: 0.6rem 1rem;
+        .nav-link {
           border-radius: 0.6rem;
+          padding: 0.6rem 1rem;
+          text-decoration: none;
           &:hover {
             background-color: #c8e7ff;
-            a {
+            div {
               color: black;
             }
           }
-          a {
-            text-decoration: none;
+          div {
             display: flex;
             gap: 1rem;
             color: white;
@@ -250,7 +272,7 @@ const Section = styled.section`
         }
         .active {
           background-color: #c8e7ff;
-          a {
+          div {
             color: black;
           }
         }
@@ -314,6 +336,7 @@ const ResponsiveNav = styled.nav`
   opacity: 0;
   visibility: hidden;
   padding: 1rem;
+  font-size: 1.2rem;
   .responsive__links {
     ul {
       list-style-type: none;
@@ -321,17 +344,17 @@ const ResponsiveNav = styled.nav`
       flex-direction: column;
       gap: 1rem;
       margin-top: 3rem;
-      li {
-        padding: 0.6rem 1rem;
+      .nav-link {
         border-radius: 0.6rem;
+        padding: 0.6rem 1rem;
+        text-decoration: none;
         &:hover {
           background-color: #c8e7ff;
-          a {
+          div {
             color: black;
           }
         }
-        a {
-          text-decoration: none;
+        div {
           display: flex;
           gap: 1rem;
           color: white;
@@ -339,7 +362,7 @@ const ResponsiveNav = styled.nav`
       }
       .active {
         background-color: #c8e7ff;
-        a {
+        div {
           color: black;
         }
       }

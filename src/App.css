@@ -6,9 +6,13 @@
     box-sizing: border-box;
 }
 
+html{
+  font-size: 12px;
+}
+
 body {
-    font-family: 'Montserrat', sans-serif;
-    background-color: black;
+    font-family: 'Montserrat', sans-serif !important;
+    background-color: black !important;
 }
 
 ::-webkit-scrollbar {
@@ -25,3 +29,15 @@ body {
     visibility: visible !important;
     right: 0 !important;
   }
+
+.display-none{
+  display: none;
+}
+
+.display-block{
+  display: block;
+}
+
+.custom-bg-danger{
+  background-color: #e63946;
+}

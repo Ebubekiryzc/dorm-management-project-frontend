@@ -1,17 +1,14 @@
 import React from "react";
 import styled from "styled-components";
-import { BiSearch } from "react-icons/bi";
 
-export default function Navbar() {
+export default function Navbar({ ...props }) {
   return (
     <Nav>
       <div className="title">
-        <h4>Hi Kishan,</h4>
         <h1>
-          Welcome to <span>MY TAXI DASHBOARD</span>
+          Hoşgeldin, <span>{props.fullName}</span>
         </h1>
       </div>
-
     </Nav>
   );
 }

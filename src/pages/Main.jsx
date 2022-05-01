@@ -1,14 +1,13 @@
 import React, { useEffect } from "react";
-import styled from "styled-components";
 import scrollreveal from "scrollreveal";
-import Navbar from "./Navbar";
-import Analytics from "./Analytics";
-import FAQ from "./FAQ";
-import Earnings from "./Earnings";
-import Profile from "./Profile";
-import Transfers from "./Transfers";
+import styled from "styled-components";
+import Analytics from "../components/Analytics";
+import Earnings from "../components/Earnings";
+import FAQ from "../components/FAQ";
+import Profile from "../components/Profile";
+import Transfers from "../components/Transfers";
 
-export default function Dashboard() {
+export default function Main() {
   useEffect(() => {
     const scroll = scrollreveal({
       origin: "bottom",
@@ -18,16 +17,15 @@ export default function Dashboard() {
     });
     scroll.reveal(
       `
-      nav,
-      .row__one,
-      .row__two
-    `,
+            nav,
+            .row__one,
+            .row__two
+          `,
       { opacity: 0, interval: 10 }
     );
   }, []);
   return (
     <Section>
-      <Navbar />
       <div className="grid">
         <div className="row__one">
           <Analytics />
@@ -44,9 +42,6 @@ export default function Dashboard() {
 }
 
 const Section = styled.section`
-  margin-left: 18vw;
-  padding: 2rem;
-  height: 100%;
   .grid {
     display: flex;
     flex-direction: column;

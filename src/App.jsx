@@ -1,8 +1,15 @@
+import "react-toastify/dist/ReactToastify.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import styled from "styled-components";
-import Dashboard from "./components/Dashboard";
+import Dashboard from "./pages/Dashboard";
 import Sidebar from "./components/Sidebar";
+
+import { Route } from "react-router-dom";
+
+import "./utilities/fontAwesome/FontAwesomeIconLib";
 import { toast } from "react-toastify";
+import Login from "./pages/Login";
 
 function App() {
   toast.configure({
@@ -19,8 +26,9 @@ function App() {
 
   return (
     <Div className="App">
-      <Sidebar />
-      <Dashboard />
+      <Route exact path="/" component={Login} />
+      <Route path="/dashboard" component={Sidebar} />
+      <Route path="/dashboard" component={Dashboard} />
     </Div>
   );
 }
