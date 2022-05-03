@@ -1,4 +1,4 @@
-import { STUDENT_LIST_REQUEST, STUDENT_LIST_SUCCESS, STUDENT_LIST_FAIL, STUDENT_LIST_RESET, STUDENT_EXPORT_REQUEST, STUDENT_EXPORT_SUCCESS, STUDENT_EXPORT_FAIL, STUDENT_DELETE_REQUEST, STUDENT_DELETE_SUCCESS, STUDENT_DELETE_FAIL, STUDENT_CREATE_REQUEST, STUDENT_CREATE_SUCCESS, STUDENT_CREATE_FAIL, STUDENT_CREATE_RESET } from "../actions/studentActions";
+import { STUDENT_LIST_REQUEST, STUDENT_LIST_SUCCESS, STUDENT_LIST_FAIL, STUDENT_LIST_RESET, STUDENT_EXPORT_REQUEST, STUDENT_EXPORT_SUCCESS, STUDENT_EXPORT_FAIL, STUDENT_DELETE_REQUEST, STUDENT_DELETE_SUCCESS, STUDENT_DELETE_FAIL, STUDENT_CREATE_REQUEST, STUDENT_CREATE_SUCCESS, STUDENT_CREATE_FAIL, STUDENT_CREATE_RESET, STUDENT_UPDATE_REQUEST, STUDENT_UPDATE_SUCCESS, STUDENT_UPDATE_FAIL } from "../actions/studentActions";
 import { students } from "../initialValues/students";
 
 const initialState = {
@@ -40,6 +40,19 @@ export function studentDeleteReducer(state = {}, { type, payload }) {
         case STUDENT_DELETE_SUCCESS:
             return { loading: false, success: true }
         case STUDENT_DELETE_FAIL:
+            return { loading: false, error: payload }
+        default:
+            return state;
+    }
+}
+
+export function studentUpdateReducer(state = {}, { type, payload }) {
+    switch (type) {
+        case STUDENT_UPDATE_REQUEST:
+            return { loading: true, ...state }
+        case STUDENT_UPDATE_SUCCESS:
+            return { loading: false, success: true }
+        case STUDENT_UPDATE_FAIL:
             return { loading: false, error: payload }
         default:
             return state;

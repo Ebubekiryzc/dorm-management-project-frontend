@@ -1,34 +1,46 @@
 import React from "react";
 import styled from "styled-components";
-import image from "../assets/femaleChar.png";
-import { HiOutlineLocationMarker } from "react-icons/hi";
+import image1 from "../assets/femaleChar.png";
+import image2 from "../assets/maleChar.png";
+import { FaUserLock } from "react-icons/fa";
 import { cardStyle } from "./ReusableStyles";
+import { useSelector } from "react-redux";
 
-export default function Profile({...props}) {
+// TODO: Rolü, Kaç gün izni kalmış
+
+export default function Profile() {
+  let userRole;
+  let roles = localStorage.getItem("roles");
+  if (roles !== undefined) {
+    roles = roles.split(",");
+    roles = roles.map(
+      (role) => `${role.charAt(0).toLocaleUpperCase()}${role.slice(1)}`
+    );
+
+    userRole = roles.join(", ");
+  }
+
+  const userDetails = useSelector((state) => state.userDetails);
+  const { userDetail } = userDetails;
   return (
     <Section>
       <div className="image">
-        <img src={image} alt="character" />
+        <img
+          src={userDetail.genderId == "2" ? image1 : image2}
+          alt="character"
+        />
       </div>
       <div className="title">
-        <h2>{props.firstName}{props.lastName}</h2>
+        <h2>{`${userDetail.firstName} ${userDetail.lastName}`}</h2>
         <h5>
-          <HiOutlineLocationMarker />
-          New York, USA
+          <FaUserLock size={"1.7rem"}/>
+          <span className="ms-3">{userRole}</span>
         </h5>
       </div>
       <div className="info">
         <div className="custom-container">
-          <h5>Days at work</h5>
+          <h5>Kalan İzin Günü</h5>
           <h3>28</h3>
-        </div>
-        <div className="custom-container">
-          <h5>Rides</h5>
-          <h3>427</h3>
-        </div>
-        <div className="custom-container">
-          <h5>Hours</h5>
-          <h3>76</h3>
         </div>
       </div>
     </Section>

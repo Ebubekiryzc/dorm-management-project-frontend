@@ -1,5 +1,6 @@
 import { toast } from "react-toastify";
 import AuthService from "../../services/authService";
+import { INDIVIDUAL_USER_DETAIL_RESET } from "./individualUserActions";
 
 import { STUDENT_LIST_RESET } from "./studentActions";
 
@@ -41,10 +42,11 @@ export const login = (username, password) => async (dispatch) => {
 }
 
 export const logout = () => (dispatch) => {
-    localStorage.removeItem("userInfo")
-    localStorage.removeItem("roles")
-    dispatch({ type: USER_LOGOUT })
-    dispatch({ type: STUDENT_LIST_RESET })
+    localStorage.removeItem("userInfo");
+    localStorage.removeItem("roles");
+    dispatch({ type: USER_LOGOUT });
+    dispatch({ type: STUDENT_LIST_RESET });
+    dispatch({ type: INDIVIDUAL_USER_DETAIL_RESET });
 }
 
 

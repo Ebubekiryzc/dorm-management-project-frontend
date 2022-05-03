@@ -7,7 +7,7 @@ import FAQ from "../components/FAQ";
 import Profile from "../components/Profile";
 import Transfers from "../components/Transfers";
 
-export default function Main() {
+export default function Main(props) {
   useEffect(() => {
     const scroll = scrollreveal({
       origin: "bottom",
@@ -29,7 +29,7 @@ export default function Main() {
       <div className="grid">
         <div className="row__one">
           <Analytics />
-          <FAQ />
+          <FAQ handleCreateDayOffFormState={props.handleCreateDayOffFormState} />
         </div>
         <div className="row__two">
           <Earnings />

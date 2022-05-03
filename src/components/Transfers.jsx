@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { HiArrowNarrowRight } from "react-icons/hi";
 import avatarImage from "../assets/avatarImage.jpeg";
 import { cardStyle } from "./ReusableStyles";
+import { Link } from "react-router-dom";
 
 export default function Transfers() {
   const transactions = [
@@ -28,16 +29,14 @@ export default function Transfers() {
   return (
     <Section>
       <div className="title">
-        <h2>Your Transfers</h2>
+        <h2>Son İzinlerin</h2>
       </div>
       <div className="transactions">
         {transactions.map((transaction, index) => {
           return (
             <div className="transaction" key={index}>
               <div className="transaction__title">
-                <div className="transaction__title__image">
-                  <img src={transaction.image} alt="transaction" />
-                </div>
+
                 <div className="transaction__title__details">
                   <h3>{transaction.name}</h3>
                   <h5>{transaction.time}</h5>
@@ -50,9 +49,9 @@ export default function Transfers() {
           );
         })}
       </div>
-      <a href="#" className="view">
+      <Link to="/dashboard/day_offs" className="view">
         View All <HiArrowNarrowRight />
-      </a>
+      </Link>
     </Section>
   );
 }

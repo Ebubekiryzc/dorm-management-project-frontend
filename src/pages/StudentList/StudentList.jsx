@@ -10,6 +10,7 @@ import {
   filterStudentsByFullName,
   filterStudentsByLastName,
   listStudents,
+  updateStudent,
 } from "../../store/actions/studentActions";
 
 import { listGenders } from "../../store/actions/genderActions";
@@ -22,7 +23,6 @@ import {
   InputGroup,
   FormLabel,
   Modal,
-  FormControl,
 } from "react-bootstrap";
 import { Formik, Form, Field } from "formik";
 import { BsFillPlusCircleFill } from "react-icons/bs";
@@ -30,7 +30,6 @@ import { AiFillEdit } from "react-icons/ai";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { FaFileExport } from "react-icons/fa";
 import { FaSearch } from "react-icons/fa";
-import TextInput from "../../components/tools/formikComponents/textInput/TextInput";
 import "./studentList.css";
 import FormikControl from "../../components/tools/formikComponents/FormikControl";
 import { listDepartments } from "../../store/actions/departmentActions";
@@ -51,34 +50,22 @@ export default function StudentList() {
   const operationClaimList = useSelector((state) => state.operationClaimList);
   const { operationClaims } = operationClaimList;
 
-  const [show, setShow] = useState(false);
+  const studentReport = useSelector((state) => state.studentReport);
+  const { message } = studentReport;
+
+  const studentDelete = useSelector((state) => state.studentDelete);
+  const { loading: loadingDelete } = studentDelete;
+
+  const studentUpdate = useSelector((state) => state.studentUpdate);
+  const { loading: loadingUpdate } = studentUpdate;
+
+  const [showInsertForm, setShowInsertForm] = useState(false);
   const [showUpdateForm, setShowUpdateForm] = useState(false);
   const [showDeleteForm, setShowDeleteForm] = useState(false);
-
-  const initialValuesForInsert = {
-    genderId: "1",
-    firstName: "",
-    lastName: "",
-    dayOffLimit: "",
-    departmentId: "1",
-    blockCode: "",
-    roomNumber: "",
-  };
-
-  const schemaInsert = yup.object({
-    firstName: yup.string().required("Ad boş bırakılmamalı"),
-    lastName: yup.string().required("Soyad boş bırakılmamalı"),
-    genderId: yup.string().required("Cinsiyet boş bırakılmamalı"),
-    departmentId: yup.number().required("Bölümü boş bırakılmamalı"),
-    dayOffLimit: yup.number().required("İzin sayısı boş bırakılmamalı"),
-    blockCode: yup.string().required("Blok kodu boş bırakılmamalı"),
-    roomNumber: yup
-      .number("Lütfen sayı giriniz")
-      .required("Oda numarası boş bırakılmamalı"),
-  });
+  const [currentStudent, setCurrentStudent] = useState({});
 
   const handleClose = () => {
-    setShow(false);
+    setShowInsertForm(false);
     handleCloseUpdateForm();
     handleCloseDeleteForm();
   };
@@ -91,20 +78,78 @@ export default function StudentList() {
     setShowDeleteForm(false);
   };
 
-  const handleShow = () => setShow(true);
+  const handleShowInsertForm = () => setShowInsertForm(true);
 
-  const handleShowUpdateForm = () => {
+  const handleShowUpdateForm = (student) => {
+    setCurrentStudent(student);
     setShowUpdateForm(true);
   };
-  const handleShowDeleteForm = () => {
+  const handleShowDeleteForm = (student) => {
+    setCurrentStudent(student);
     setShowDeleteForm(true);
   };
 
-  const handleSubmitAddStudent = (
+  const handleSubmitDeleteStudent = () => {
+    const student = {
+      individualUserId: currentStudent.id,
+      departmentId: currentStudent.departmentName,
+      dateOfEntry: currentStudent.dateOfEntry,
+      blockCode: currentStudent.blockCode,
+      roomNumber: currentStudent.roomNumber,
+    };
+    dispatch(deleteStudent(student));
+    setTimeout(() => {
+      dispatch(listStudents());
+    }, 500);
+    setShowDeleteForm(false);
+  };
+
+  const handleSubmitUpdateStudent = (
     firstName,
     lastName,
-    genderId,
-    departmentId,
+    genderName,
+    departmentName,
+    dayOffLimit,
+    blockCode,
+    roomNumber,
+    password
+  ) => {
+    const currentDateOfEntry = new Date(currentStudent.dateOfEntry);
+    const studentRegisterDto = {
+      individualUserRegisterDto: {
+        authenticateUserDTO: {
+          username: currentStudent.username.toLocaleLowerCase("tr-TR"),
+          password: password.toLocaleLowerCase("tr-TR"),
+        },
+        genderName: genderName,
+        firstName: firstName,
+        lastName: lastName,
+        dayOffLimit: dayOffLimit,
+      },
+      facultyId: "1",
+      departmentName: departmentName,
+      roles: [operationClaims],
+      dateOfEntry: `${currentDateOfEntry.getDate()}-${
+        currentDateOfEntry.getMonth() + 1
+      }-${currentDateOfEntry.getFullYear()}`,
+      blockCode: blockCode,
+      roomNumber: roomNumber,
+    };
+    console.log(studentRegisterDto);
+    dispatch(updateStudent(studentRegisterDto));
+    setTimeout(() => {
+      dispatch(listStudents());
+    }, 500);
+    setShowUpdateForm(false);
+  };
+
+  const handleSubmitAddStudent = (
+    username,
+    firstName,
+    lastName,
+    genderName,
+    facultyId,
+    departmentName,
     dayOffLimit,
     blockCode,
     roomNumber
@@ -113,30 +158,83 @@ export default function StudentList() {
     const studentRegisterDto = {
       individualUserRegisterDto: {
         authenticateUserDTO: {
-          username: firstName.toLowerCase().concat(lastName.toLowerCase()),
-          password: firstName.toLowerCase().concat(lastName.toLowerCase()),
+          username: username.trim().toLocaleLowerCase("tr-TR"),
+          password: firstName
+            .toLocaleLowerCase("tr-TR")
+            .trim()
+            .concat(lastName.toLocaleLowerCase("tr-TR").trim()),
         },
-        genderId: genderId,
-        firstName: firstName,
-        lastName: lastName,
+        genderName: genderName,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
         dayOffLimit: dayOffLimit,
       },
-      departmentId: departmentId,
+      facultyId: facultyId,
+      departmentName: departmentName,
       roles: [operationClaims],
       dateOfEntry: `${today.getDate()}-${
         today.getMonth() + 1
       }-${today.getFullYear()}`,
-      blockCode: blockCode,
+      blockCode: blockCode.trim(),
       roomNumber: roomNumber,
     };
-    //console.log(studentRegisterDto);
     dispatch(registerStudent(studentRegisterDto));
-    dispatch(listStudents())
-    setShow(false);
+    setTimeout(() => {
+      dispatch(listStudents());
+    }, 500);
+    setShowInsertForm(false);
   };
 
-  const studentReport = useSelector((state) => state.studentReport);
-  const { message } = studentReport;
+  const initialValuesForInsert = {
+    username: "",
+    genderName: "Erkek",
+    firstName: "",
+    lastName: "",
+    dayOffLimit: "",
+    facultyId: "1",
+    departmentName: "Bilgisayar Mühendisliği",
+    blockCode: "",
+    roomNumber: "",
+  };
+
+  const schemaInsert = yup.object({
+    username: yup.string().required("Kullanıcı adı boş bırakılmamalı"),
+    firstName: yup.string().required("Ad boş bırakılmamalı"),
+    lastName: yup.string().required("Soyad boş bırakılmamalı"),
+    genderName: yup.string().required("Cinsiyet boş bırakılmamalı"),
+    departmentName: yup.string().required("Bölümü boş bırakılmamalı"),
+    dayOffLimit: yup.number().required("İzin sayısı boş bırakılmamalı"),
+    blockCode: yup.string().required("Blok kodu boş bırakılmamalı"),
+    roomNumber: yup
+      .number("Lütfen sayı giriniz")
+      .required("Oda numarası boş bırakılmamalı"),
+  });
+
+  const initialValuesForUpdate = {
+    username: currentStudent.username,
+    genderName: currentStudent.genderName,
+    firstName: currentStudent.firstName,
+    lastName: currentStudent.lastName,
+    dayOffLimit: currentStudent.dayOffLimit,
+    facultyId: currentStudent.facultyId,
+    departmentName: currentStudent.departmentName,
+    blockCode: currentStudent.blockCode,
+    roomNumber: currentStudent.roomNumber,
+    password: "",
+  };
+
+  const schemaUpdate = yup.object({
+    firstName: yup.string().required("Ad boş bırakılmamalı"),
+    lastName: yup.string().required("Soyad boş bırakılmamalı"),
+    genderName: yup.string().required("Cinsiyet boş bırakılmamalı"),
+    departmentName: yup.string().required("Bölümü boş bırakılmamalı"),
+    dayOffLimit: yup.number().required("İzin sayısı boş bırakılmamalı"),
+    blockCode: yup.string().required("Blok kodu boş bırakılmamalı"),
+    roomNumber: yup
+      .number("Lütfen sayı giriniz")
+      .required("Oda numarası boş bırakılmamalı"),
+    password: yup.string(),
+  });
 
   const initialValues = {
     query: "",
@@ -157,6 +255,7 @@ export default function StudentList() {
     return { firstName, lastName };
   };
 
+  //TODO: lastname yanlış atanıyor. Bunu bir kontrol etmelisin.
   const handleFilterStudents = (values) => {
     let { checked, query } = values;
 
@@ -170,10 +269,8 @@ export default function StudentList() {
         dispatch(filterStudentsByLastName(query));
       }
     } else {
+      dispatch(filterStudentsByFirstName(query));
       checked.push("1");
-      checked.push("2");
-      const { firstName, lastName } = getFirstNameAndLastName(query);
-      dispatch(filterStudentsByFullName(firstName, lastName));
     }
   };
 
@@ -187,6 +284,8 @@ export default function StudentList() {
         <Loader />
       ) : (
         <Section>
+          {loadingDelete && <Loader />}
+          {loadingUpdate && <Loader />}
           {!students ? (
             error
           ) : (
@@ -269,7 +368,7 @@ export default function StudentList() {
                       <Button
                         variant="success"
                         className="ms-auto w-100 h-100  float-end"
-                        onClick={handleShow}
+                        onClick={handleShowInsertForm}
                       >
                         <BsFillPlusCircleFill className="me-2" />
                         <span>Öğrenci Ekle</span>
@@ -289,6 +388,7 @@ export default function StudentList() {
                   <thead>
                     <tr>
                       <th className="d-none">Id</th>
+                      <th>Kullanıcı Adı</th>
                       <th>Ad</th>
                       <th>Soyad</th>
                       <th>Cinsiyet</th>
@@ -305,6 +405,7 @@ export default function StudentList() {
                     {students.map((student, index) => (
                       <tr key={index}>
                         <td className="d-none">{student.id}</td>
+                        <td>{student.username}</td>
                         <td>{student.firstName}</td>
                         <td>{student.lastName}</td>
                         <td>{student.genderName}</td>
@@ -314,12 +415,20 @@ export default function StudentList() {
                         <td>{student.blockCode}</td>
                         <td>{student.roomNumber}</td>
                         <td>
-                          <Button variant="warning" className="text-light">
+                          <Button
+                            variant="warning"
+                            className="text-light"
+                            onClick={() => handleShowUpdateForm(student)}
+                          >
                             <AiFillEdit />
                           </Button>
                         </td>
                         <td>
-                          <Button variant="danger" className="text-light">
+                          <Button
+                            variant="danger"
+                            className="text-light"
+                            onClick={() => handleShowDeleteForm(student)}
+                          >
                             <RiDeleteBin6Line />
                           </Button>
                         </td>
@@ -328,11 +437,11 @@ export default function StudentList() {
                   </tbody>
                 </Table>
               ) : (
-                <span>Eşleşen bir kayıt bulunamadı.</span>
+                <span>Herhangi bir kayıt bulunamadı.</span>
               )}
 
               <Modal
-                show={show && !showUpdateForm && !showDeleteForm}
+                show={showInsertForm}
                 onHide={handleClose}
                 dialogClassName="insert-form"
               >
@@ -356,10 +465,12 @@ export default function StudentList() {
                     validationSchema={schemaInsert}
                     onSubmit={(values) =>
                       handleSubmitAddStudent(
+                        values.username,
                         values.firstName,
                         values.lastName,
-                        values.genderId,
-                        values.departmentId,
+                        values.genderName,
+                        values.facultyId,
+                        values.departmentName,
                         values.dayOffLimit,
                         values.blockCode,
                         values.roomNumber
@@ -368,6 +479,11 @@ export default function StudentList() {
                   >
                     {(formik) => (
                       <Form>
+                        <FormikControl
+                          name="username"
+                          label="Kullanıcı Adı"
+                          control="input"
+                        />
                         <FormikControl
                           name="firstName"
                           label="Adı"
@@ -379,13 +495,13 @@ export default function StudentList() {
                           control="input"
                         />
                         <FormikControl
-                          name="genderId"
+                          name="genderName"
                           label="Cinsiyet"
                           options={genders}
                           control="radio"
                         />
                         <FormikControl
-                          name="departmentId"
+                          name="departmentName"
                           label="Bölüm"
                           options={departments}
                           control="select"
@@ -420,6 +536,130 @@ export default function StudentList() {
                     )}
                   </Formik>
                 </Modal.Body>
+              </Modal>
+
+              <Modal
+                show={showUpdateForm}
+                onHide={handleClose}
+                dialogClassName="insert-form"
+              >
+                <Modal.Header>
+                  <Modal.Title className="mx-auto text-center">
+                    Öğrenci Güncelle
+                  </Modal.Title>
+                  <Button
+                    className="align-self-end"
+                    variant="outline-warning"
+                    aria-label="Close"
+                    onClick={handleClose}
+                  >
+                    X
+                  </Button>
+                </Modal.Header>
+                <Modal.Body>
+                  <Formik
+                    enableReinitialize
+                    initialValues={initialValuesForUpdate}
+                    validationSchema={schemaUpdate}
+                    onSubmit={(values) =>
+                      handleSubmitUpdateStudent(
+                        values.firstName,
+                        values.lastName,
+                        values.genderName,
+                        values.departmentName,
+                        values.dayOffLimit,
+                        values.blockCode,
+                        values.roomNumber,
+                        values.password
+                      )
+                    }
+                  >
+                    {(formik) => (
+                      <Form>
+                        <FormikControl
+                          name="username"
+                          label="Kullanıcı Adı"
+                          control="input"
+                          className="disabled"
+                          disabled
+                        />
+                        <FormikControl
+                          name="firstName"
+                          label="Adı"
+                          control="input"
+                        />
+                        <FormikControl
+                          name="lastName"
+                          label="Soyadı"
+                          control="input"
+                        />
+                        <FormikControl
+                          name="genderName"
+                          label="Cinsiyet"
+                          options={genders}
+                          control="radio"
+                        />
+                        <FormikControl
+                          name="departmentName"
+                          label="Bölüm"
+                          options={departments}
+                          control="select"
+                        />
+                        <FormikControl
+                          name="dayOffLimit"
+                          label="İzin Sayısı"
+                          control="input"
+                          type="number"
+                        />
+                        <FormikControl
+                          name="blockCode"
+                          label="Blok"
+                          control="input"
+                        />
+                        <FormikControl
+                          name="roomNumber"
+                          label="Oda Numarası"
+                          control="input"
+                          type="number"
+                        />
+                        <hr />
+                        <FormikControl
+                          name="password"
+                          label="Parola"
+                          control="input"
+                          type="password"
+                          placeholder="Yeni parola"
+                        />
+                        <div className="d-flex flex-column align-items-center justify-content-center">
+                          <Button
+                            className="text-light mt-4"
+                            variant="warning"
+                            as="input"
+                            type="submit"
+                            value="Kaydet"
+                          />
+                        </div>
+                      </Form>
+                    )}
+                  </Formik>
+                </Modal.Body>
+              </Modal>
+              <Modal show={showDeleteForm} onHide={handleClose}>
+                <Modal.Header closeButton>
+                  <Modal.Title>Emin misiniz?</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                  {currentStudent.firstName} öğrencisinin kaydını silmek
+                  istediğinizden emin misiniz?
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button variant="secondary" onClick={handleClose}>
+                    İptal
+                  </Button>
+                  <Button variant="danger" onClick={handleSubmitDeleteStudent}>
+                    Sil
+                  </Button>
+                </Modal.Footer>
               </Modal>
             </div>
           )}

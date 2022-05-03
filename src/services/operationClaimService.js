@@ -9,6 +9,6 @@ export default class OperationClaimService {
     }
 
     async getByName(config, name) {
-        return axios.get(`${url}/by_name/${name}`, config);
+        return axios.get(`${url}/filter?name=${name}`, config);
     }
 }

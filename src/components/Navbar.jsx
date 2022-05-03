@@ -1,12 +1,13 @@
 import React from "react";
 import styled from "styled-components";
 
-export default function Navbar({ ...props }) {
+export default function Navbar(props) {
   return (
     <Nav>
       <div className="title">
         <h1>
-          Hoşgeldin, <span>{props.fullName}</span>
+          Hoşgeldin,
+          <span>{`${props.firstName} ${props.lastName}`}</span>
         </h1>
       </div>
     </Nav>

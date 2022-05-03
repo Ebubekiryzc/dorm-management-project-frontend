@@ -18,8 +18,8 @@ export default function RadioButtons(props) {
                     type="radio"
                     id={option.id}
                     {...field}
-                    value={option.id}
-                    checked={field.value == option.id}
+                    value={option.name}
+                    checked={field.value == option.name}
                   />
                   <label htmlFor={option.id}>{option.name}</label>
                 </div>

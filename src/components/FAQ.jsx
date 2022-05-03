@@ -1,35 +1,37 @@
 import React from "react";
 import styled from "styled-components";
 import { IoIosArrowForward } from "react-icons/io";
-import { AiFillCalendar } from "react-icons/ai";
-import { MdTimelapse } from "react-icons/md";
-import { IoMdCash } from "react-icons/io";
+import { FaUserGraduate } from "react-icons/fa";
+import { MdMoreTime } from "react-icons/md";
+import { BsFillFilePersonFill } from "react-icons/bs";
 import { cardStyle } from "./ReusableStyles";
 
-export default function FAQ() {
+// TODO: Burası işlem olarak düzenlenecek
+export default function FAQ(props) {
   const faqs = [
     {
-      icon: <AiFillCalendar />,
-      text: "How to manage time and get good marks for trips",
+      icon: <MdMoreTime size={"1.7rem"}/>,
+      text: "Kendine bir keyif molası ver",
+      onClick: props.handleCreateDayOffFormState
     },
     {
-      icon: <MdTimelapse />,
-      text: "How to regulate transactions over time",
+      icon: <BsFillFilePersonFill />,
+      text: "Görevlileri yönet / Yeni bir görevli ekle",
     },
     {
-      icon: <IoMdCash />,
-      text: "Withdrawing money through an ATM",
+      icon: <FaUserGraduate />,
+      text: "Öğrencileri yönet / Yeni bir öğrenci ekle",
     },
   ];
   return (
     <Section>
       <div className="title">
-        <h2>Information for drivers</h2>
+        <h2>Hızlı İşlemler</h2>
       </div>
       <div className="faqs">
         {faqs.map((faq, index) => {
           return (
-            <div className="faq" key={index}>
+            <div className="faq" key={index} onClick={faq.onClick}>
               <div className="info">
                 {faq.icon}
                 <h4>{faq.text}</h4>

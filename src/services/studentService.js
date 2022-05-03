@@ -23,6 +23,10 @@ export default class StudentService {
     }
 
     async deleteStudent(config, student) {
-        return axios.delete(`${url}`, config)
+        return axios.post(`${url}/delete`, student, config);
+    }
+
+    async updateStudent(config, studentRegisterDto) {
+        return axios.post(`${url}/update`, studentRegisterDto, config);
     }
 }
